@@ -1,6 +1,6 @@
 namespace Rauschen;
 
-static class WriterExtensions
+public static class WriterExtensions
 {
     const double NoteVolume = 0.25;
 

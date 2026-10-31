@@ -39,12 +39,15 @@ public static class WavExample
 
         using var writer = new WavWriter("audio.wav", RATE);
 
-        const double BPM = 200; // 60 / 200 = 0.3 seconds per beat
+        // 60 / 240 = 0.25. 
+        // that is 0.25 seconds per beat or 4 beats per second
+        const double bpm = 240;
+
         foreach (var note in odeToJoy)
         {
-            writer.WriteNote(note.ToSeconds(BPM), note.Pitch);
+            writer.WriteNote(note.ToSeconds(bpm), note.Pitch);
         }
-        writer.WriteRest(6 * 60.0 / BPM);
+        writer.WriteRest(6 * 60.0 / bpm);
 
     }
 }

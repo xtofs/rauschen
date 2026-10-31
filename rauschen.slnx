@@ -2,5 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/console/console.csproj" />
     <Project Path="src/gen/gen.csproj" />
+    <Project Path="src/Rauschen/Rauschen.csproj" />
   </Folder>
 </Solution>

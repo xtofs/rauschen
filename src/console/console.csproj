@@ -8,4 +8,8 @@
     <RootNamespace>Rauschen</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="../Rauschen/Rauschen.csproj" />
+  </ItemGroup>
+
 </Project>
