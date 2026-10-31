@@ -1,4 +1,4 @@
-
+namespace Rauschen;
 
 static class Play
 {
@@ -7,9 +7,9 @@ static class Play
     // this is the note with index 0 in the semitone system
     const double A4 = 440;
 
-    public static short[] Note(int rate, double duration, int note)
+    public static void WriteNote(this WavWriter w, double duration, int note)
     {
-        return Note(rate, duration, A4 * Math.Pow(2, note / 12.0));
+        w.Write(Note(w.Rate, duration, A4 * Math.Pow(2, note / 12.0)));
     }
 
     const double NoteVolume = 0.25;

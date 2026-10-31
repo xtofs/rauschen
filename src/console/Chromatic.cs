@@ -1,0 +1,112 @@
+static class Chromatic
+{
+    public const int
+        C0 = -25, // natural C
+        Cs0 = -24, // C♯
+        Df0 = -24, // D♭
+        D0 = -23, // natural D
+        Ds0 = -22, // D♯
+        Ef0 = -22, // E♭
+        E0 = -21, // natural E
+        F0 = -20, // natural F
+        Fs0 = -19, // F♯
+        Gf0 = -19, // G♭
+        G0 = -18, // natural G
+        Gs0 = -17, // G♯
+        Af0 = -17, // A♭
+        A0 = -16, // natural A
+        As0 = -15, // A♯
+        Bf0 = -15, // B♭
+        B0 = -14, // natural B
+
+        C1 = -13, // natural C
+        Cs1 = -12, // C♯
+        Df1 = -12, // D♭
+        D1 = -11, // natural D
+        Ds1 = -10, // D♯
+        Ef1 = -10, // E♭
+        E1 = -9, // natural E
+        F1 = -8, // natural F
+        Fs1 = -7, // F♯
+        Gf1 = -7, // G♭
+        G1 = -6, // natural G
+        Gs1 = -5, // G♯
+        Af1 = -5, // A♭
+        A1 = -4, // natural A
+        As1 = -3, // A♯
+        Bf1 = -3, // B♭
+        B1 = -2, // natural B
+
+        C2 = -1, // natural C
+        Cs2 = 0, // C♯
+        Df2 = 0, // D♭
+        D2 = 1, // natural D
+        Ds2 = 2, // D♯
+        Ef2 = 2, // E♭
+        E2 = 3, // natural E
+        F2 = 4, // natural F
+        Fs2 = 5, // F♯
+        Gf2 = 5, // G♭
+        G2 = 6, // natural G
+        Gs2 = 7, // G♯
+        Af2 = 7, // A♭
+        A2 = 8, // natural A
+        As2 = 9, // A♯
+        Bf2 = 9, // B♭
+        B2 = 10, // natural B
+
+        C3 = 11, // natural C
+        Cs3 = 12, // C♯
+        Df3 = 12, // D♭
+        D3 = 13, // natural D
+        Ds3 = 14, // D♯
+        Ef3 = 14, // E♭
+        E3 = 15, // natural E
+        F3 = 16, // natural F
+        Fs3 = 17, // F♯
+        Gf3 = 17, // G♭
+        G3 = 18, // natural G
+        Gs3 = 19, // G♯
+        Af3 = 19, // A♭
+        A3 = 20, // natural A
+        As3 = 21, // A♯
+        Bf3 = 21, // B♭
+        B3 = 22, // natural B
+
+        C4 = 23, // natural C
+        Cs4 = 24, // C♯
+        Df4 = 24, // D♭
+        D4 = 25, // natural D
+        Ds4 = 26, // D♯
+        Ef4 = 26, // E♭
+        E4 = 27, // natural E
+        F4 = 28, // natural F
+        Fs4 = 29, // F♯
+        Gf4 = 29, // G♭
+        G4 = 30, // natural G
+        Gs4 = 31, // G♯
+        Af4 = 31, // A♭
+        A4 = 32, // natural A
+        As4 = 33, // A♯
+        Bf4 = 33, // B♭
+        B4 = 34, // natural B
+
+        C5 = 35, // natural C
+        Cs5 = 36, // C♯
+        Df5 = 36, // D♭
+        D5 = 37, // natural D
+        Ds5 = 38, // D♯
+        Ef5 = 38, // E♭
+        E5 = 39, // natural E
+        F5 = 40, // natural F
+        Fs5 = 41, // F♯
+        Gf5 = 41, // G♭
+        G5 = 42, // natural G
+        Gs5 = 43, // G♯
+        Af5 = 43, // A♭
+        A5 = 44, // natural A
+        As5 = 45, // A♯
+        Bf5 = 45, // B♭
+        B5 = 46 // natural B
+    ;
+}

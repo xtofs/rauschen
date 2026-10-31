@@ -1,4 +1,3 @@
-
 # text format
 
 ## sample format Scientific pitch + duration
@@ -32,7 +31,6 @@ s = sixteenth
 dq = dotted quarter
 ```
 
-
 ## more compact text format
 
 ```plain
@@ -43,4 +41,4 @@ E4/4. D4/8 D4/2
 ```
 
 where the length is after the / as the fraction so /4 is a quarter and /2 is a half note.
-And the dot in ```E4/4.``` is a dotted quarter note.
+And the dot in `E4/4.

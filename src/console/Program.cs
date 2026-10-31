@@ -1,23 +1,15 @@
-﻿// WavExample.cs — writes a 1-second 440 Hz mono 16-bit WAV with an INFO list.
+﻿namespace Rauschen;
 
-using System;
-using System.IO;
-
-using Riff;
+using static Chromatic;
 
 public static class WavExample
-
 {
     const int RATE = 44_100;
-
-    const int
-        C3 = -21, D3 = -19, E3 = -17, F3 = -16, G3 = -14,
-        C4 = -9, D4 = -7, E4 = -5, F4 = -4, G4 = -2;
 
     public static void Main()
     {
 
-      
+
         (int n, double beats)[] odeToJoy =
         [
             // mm. 1-4
@@ -47,12 +39,26 @@ public static class WavExample
 
         using var writer = new WavWriter("audio.wav", RATE);
 
-        const double secondsPerBeat = 0.5;   // 120 BPM
+        const double secondsPerBeat = 0.3; // 0.5 => 60 / 0.5 = 120 BPM
         foreach (var (n, beats) in odeToJoy)
         {
-            var note = Play.Note(RATE, beats * secondsPerBeat, n);
-            writer.Write(note);
+            writer.WriteNote(beats * secondsPerBeat, n - 48);
         }
+        writer.WriteNote(6 * secondsPerBeat, -100);
+
+
+
+//         double[] signal = FftSharp.SampleData.SampleAudio1();
+
+// // Shape the signal using a Hanning window
+// var window = new FftSharp.Windows.Hanning();
+// window.ApplyInPlace(signal);
+
+// // Calculate the FFT as an array of complex numbers
+// System.Numerics.Complex[] spectrum = FftSharp.FFT.Forward(signal);
+
+// // or get the magnitude (units²) or power (dB) as real numbers
+// double[] magnitude = FftSharp.FFT.Magnitude(spectrum);
+// double[] power = FftSharp.FFT.Power(spectrum);
     }
 }
-

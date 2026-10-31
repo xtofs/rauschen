@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/console/console.csproj" />
+    <Project Path="src/gen/gen.csproj" />
   </Folder>
 </Solution>
