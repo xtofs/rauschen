@@ -1,6 +1,6 @@
 ﻿namespace Rauschen;
 
-using static Chromatic;
+using static Monophonic;
 
 public static class WavExample
 {
@@ -10,55 +10,41 @@ public static class WavExample
     {
 
 
-        (int n, double beats)[] odeToJoy =
-        [
-            // mm. 1-4
-            (E4,1), (E4,1), (F4,1), (G4,1),
-            (G4,1), (F4,1), (E4,1), (D4,1),
-            (C4,1), (C4,1), (D4,1), (E4,1),
-            (E4,1.5), (D4,0.5), (D4,2),
+        var odeToJoy = """
+            E4/4 E4/4 F4/4 G4/4 |
+            G4/4 F4/4 E4/4 D4/4 |
+            C4/4 C4/4 D4/4 E4/4 |
+            E4/4. D4/8 D4/2     |
 
-            // mm. 5-8
-            (E4,1), (E4,1), (F4,1), (G4,1),
-            (G4,1), (F4,1), (E4,1), (D4,1),
-            (C4,1), (C4,1), (D4,1), (E4,1),
-            (D4,1.5), (C4,0.5), (C4,2),
+            E4/4 E4/4 F4/4 G4/4 |
+            G4/4 F4/4 E4/4 D4/4 |
+            C4/4 C4/4 D4/4 E4/4 |
+            D4/4. C4/8 C4/2     |
 
-            // mm. 9-12
-            (D4,1), (D4,1), (E4,1), (C4,1),
-            (D4,1), (E4,0.5), (F4,0.5), (E4,1), (C4,1),
-            (D4,1), (E4,0.5), (F4,0.5), (E4,1), (D4,1),
-            (C4,1), (D4,1), (G3,2),
+            D4/4 D4/4 E4/4 C4/4      |
+            D4/4 E4/8 F4/8 E4/4 C4/4 |
+            D4/4 E4/8 F4/8 E4/4 D4/4 |
+            C4/4 D4/4 G3/2           |
 
-            // mm. 13-16
-            (E4,1), (E4,1), (F4,1), (G4,1),
-            (G4,1), (F4,1), (E4,1), (D4,1),
-            (C4,1), (C4,1), (D4,1), (E4,1),
-            (D4,1.5), (C4,0.5), (C4,2)
-        ];
+            E4/4 E4/4 F4/4 G4/4 |
+            G4/4 F4/4 E4/4 D4/4 |
+            C4/4 C4/4 D4/4 E4/4 |
+            D4/4. C4/8 C4/2     |
+        """.ParseMelody();
+
+        foreach (var note in odeToJoy)
+        {
+            Console.WriteLine(note);
+        }
 
         using var writer = new WavWriter("audio.wav", RATE);
 
-        const double secondsPerBeat = 0.3; // 0.5 => 60 / 0.5 = 120 BPM
-        foreach (var (n, beats) in odeToJoy)
+        const double BPM = 200; // 60 / 200 = 0.3 seconds per beat
+        foreach (var note in odeToJoy)
         {
-            writer.WriteNote(beats * secondsPerBeat, n - 48);
+            writer.WriteNote(note.ToSeconds(BPM), note.Pitch);
         }
-        writer.WriteNote(6 * secondsPerBeat, -100);
+        writer.WriteRest(6 * 60.0 / BPM);
 
-
-
-//         double[] signal = FftSharp.SampleData.SampleAudio1();
-
-// // Shape the signal using a Hanning window
-// var window = new FftSharp.Windows.Hanning();
-// window.ApplyInPlace(signal);
-
-// // Calculate the FFT as an array of complex numbers
-// System.Numerics.Complex[] spectrum = FftSharp.FFT.Forward(signal);
-
-// // or get the magnitude (units²) or power (dB) as real numbers
-// double[] magnitude = FftSharp.FFT.Magnitude(spectrum);
-// double[] power = FftSharp.FFT.Power(spectrum);
     }
 }
