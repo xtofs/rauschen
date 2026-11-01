@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# /// script
+# dependencies = ["numpy", "matplotlib"]
+# ///
 """Plots the spectra of the generated WAV files.
 
 Left panel:  the noise colors (noise-*.wav) as power spectra on a log frequency
@@ -10,20 +13,40 @@ Files that don't exist are skipped. Run the demo apps first:
     dotnet run --project src/noise
     dotnet run --project src/spectrum
 
-Requires numpy and matplotlib (not in the standard library), e.g.:
+Dependencies (numpy, matplotlib) — pick one:
 
-    python3 -m venv .venv && .venv/bin/pip install numpy matplotlib
+    uv run scripts/plot_spectra.py        # uv reads the inline metadata above
+
+or, with a virtual environment (macOS system Python is externally managed,
+so installing into it directly won't work):
+
+    python3 -m venv .venv
+    .venv/bin/pip install -r scripts/requirements.txt
     .venv/bin/python scripts/plot_spectra.py
 
-Usage: plot_spectra.py [output.png]   (default: spectra.png)
+Usage:
+
+    plot_spectra.py                        # default demo plot -> spectra.png
+    plot_spectra.py -o out.png             # choose the output image
+    plot_spectra.py audio.wav              # plot specific WAV file(s) instead
+    plot_spectra.py a.wav b.wav -o ab.png
 """
 
 import os
 import sys
 import wave
 
-import numpy as np
-import matplotlib
+try:
+    import numpy as np
+    import matplotlib
+except ImportError as e:
+    sys.exit(
+        f"missing dependency: {e.name}\n"
+        "install with one of:\n"
+        "  uv run scripts/plot_spectra.py\n"
+        "  python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt\n"
+        "  (then run with .venv/bin/python)"
+    )
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -49,6 +72,23 @@ def read_block(path):
     return rate, samples
 
 
+def band_power(rate, samples):
+    """Log-band-averaged power spectrum: returns (band frequencies, band power)."""
+    freqs = np.fft.rfftfreq(N, 1 / rate)
+    power = np.abs(np.fft.rfft(samples)) ** 2
+
+    # average into log-spaced bands for a readable line
+    edges = np.logspace(np.log10(25), np.log10(20_000), 120)
+    idx = np.searchsorted(freqs, edges)
+    band_f, band_p = [], []
+    for i in range(len(edges) - 1):
+        lo, hi = idx[i], idx[i + 1]
+        if hi > lo:
+            band_f.append(np.sqrt(edges[i] * edges[i + 1]))  # geometric center
+            band_p.append(power[lo:hi].mean())
+    return band_f, band_p
+
+
 def plot_noise(ax):
     found = False
     for name, color, slope in NOISE_COLORS:
@@ -58,18 +98,7 @@ def plot_noise(ax):
             continue
         found = True
         rate, samples = read_block(path)
-        freqs = np.fft.rfftfreq(N, 1 / rate)
-        power = np.abs(np.fft.rfft(samples)) ** 2
-
-        # average into log-spaced bands for a readable line
-        edges = np.logspace(np.log10(25), np.log10(20_000), 120)
-        idx = np.searchsorted(freqs, edges)
-        band_f, band_p = [], []
-        for i in range(len(edges) - 1):
-            lo, hi = idx[i], idx[i + 1]
-            if hi > lo:
-                band_f.append(np.sqrt(edges[i] * edges[i + 1]))  # geometric center
-                band_p.append(power[lo:hi].mean())
+        band_f, band_p = band_power(rate, samples)
         ax.plot(band_f, 10 * np.log10(band_p), color=color, label=f"{name} ({slope:+d} dB/oct)")
 
     ax.set_xscale("log")
@@ -102,16 +131,44 @@ def plot_chord(ax, path="spectrum.wav"):
     ax.grid(True, alpha=0.3)
 
 
-def main():
-    output = sys.argv[1] if len(sys.argv) > 1 else "spectra.png"
+def plot_wavs(ax, paths):
+    """Plots the power spectrum of arbitrary WAV files, one line per file."""
+    for path in paths:
+        rate, samples = read_block(path)
+        band_f, band_p = band_power(rate, samples)
+        ax.plot(band_f, 10 * np.log10(np.maximum(band_p, 1e-12)), label=os.path.basename(path))
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
-    plot_noise(ax1)
-    plot_chord(ax2)
+    ax.set_xscale("log")
+    ax.set_xlabel("frequency [Hz]")
+    ax.set_ylabel("power [dB]")
+    ax.set_title("power spectra (first block)")
+    ax.legend()
+    ax.grid(True, which="both", alpha=0.3)
+
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Plots WAV power spectra. Without arguments, plots the "
+                    "default demo output (noise-*.wav and spectrum.wav).")
+    parser.add_argument("wavs", nargs="*",
+                        help="WAV files to plot instead of the default demo files")
+    parser.add_argument("-o", "--output", default="spectra.png",
+                        help="output image (default: %(default)s)")
+    args = parser.parse_args()
+
+    if args.wavs:
+        fig, ax = plt.subplots(figsize=(8, 5))
+        plot_wavs(ax, args.wavs)
+    else:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+        plot_noise(ax1)
+        plot_chord(ax2)
 
     plt.tight_layout()
-    plt.savefig(output, dpi=110)
-    print(f"saved {output}")
+    plt.savefig(args.output, dpi=110)
+    print(f"saved {args.output}")
 
 
 if __name__ == "__main__":

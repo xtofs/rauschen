@@ -74,8 +74,18 @@ FFT bin gets a **uniformly random phase** (that is what makes it noise) and a
 magnitude following the power envelope *P ∝ 1/f^α* — white (α = 0), pink (1),
 brown (2), blue (−1), violet (−2), i.e. 0 / −3 / −6 / +3 / +6 dB per octave.
 The shared `Spectrum.ToSamples` then inverse-FFTs the spectrum into PCM samples.
-`scripts/plot_spectra.py` (needs numpy + matplotlib) plots the resulting spectra
-to verify the slopes visually.
+`scripts/plot_spectra.py` plots the resulting spectra to verify the slopes
+visually. It needs numpy + matplotlib: either `uv run scripts/plot_spectra.py`
+(dependencies are declared inline), or
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -r scripts/requirements.txt
+.venv/bin/python scripts/plot_spectra.py
+```
+
+Without arguments it plots the demo output (`noise-*.wav`, `spectrum.wav`);
+pass WAV files to plot those instead: `plot_spectra.py audio.wav -o out.png`.
 
 ## Build and run
 
