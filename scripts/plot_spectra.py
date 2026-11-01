@@ -11,7 +11,7 @@ Right panel: the chord spectrum (spectrum.wav) with its harmonic spikes.
 Files that don't exist are skipped. Run the demo apps first:
 
     dotnet run --project src/noise
-    dotnet run --project src/spectrum
+    dotnet run --project src/melody
 
 Dependencies (numpy, matplotlib) — pick one:
 

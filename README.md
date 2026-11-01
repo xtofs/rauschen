@@ -16,7 +16,7 @@ rauschen/
 │   │   ├── WriterExtensions.cs  # WriteNote / WriteRest (sine synthesis)
 │   │   └── WAV/           # low-level RIFF/WAV writing
 │   ├── console/           # demo executable
-│   ├── spectrum/          # demo: inverse-FFT synthesis with FftSharp
+│   ├── melody/            # demo: chord synthesis via inverse FFT (FftSharp)
 │   └── noise/             # demo: colors of noise (white, pink, brown, blue, violet)
 ├── scripts/
 │   ├── gen_pitches.py     # generates the named-pitch constants in Pitch.cs
@@ -92,7 +92,7 @@ pass WAV files to plot those instead: `plot_spectra.py audio.wav -o out.png`.
 ```sh
 dotnet build rauschen.slnx
 dotnet run --project src/console    # writes audio.wav to the working directory
-dotnet run --project src/spectrum   # writes spectrum.wav (chord from an inverse FFT)
+dotnet run --project src/melody     # writes melody-over-chords.wav (I | V7 | I | V7)
 dotnet run --project src/noise      # writes noise-white.wav ... noise-violet.wav
 ./convert.sh audio.wav              # optional: convert to audio.m4a (needs ffmpeg)
 ```
