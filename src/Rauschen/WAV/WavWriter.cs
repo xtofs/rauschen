@@ -36,10 +36,30 @@ public class WavWriter : IDisposable
         _scopes.Push(_riffWriter.BeginChunk("data"));
     }
 
-    public void Write(ReadOnlySpan<short> data)
+    /// <summary>
+    /// Writes a track of samples in [-1, 1], scaled by <paramref name="volume"/>,
+    /// as 16-bit PCM. Values outside the range are clamped. This is the single
+    /// place where floating-point audio is converted to integer PCM — all
+    /// processing code operates on doubles.
+    /// </summary>
+    public void Write(ReadOnlySpan<double> track, double volume = 1.0)
+    {
+        var buffer = Pool.Rent(track.Length);
+        for (var i = 0; i < track.Length; i++)
+        {
+            buffer[i] = (short)(short.MaxValue * Math.Clamp(track[i] * volume, -1.0, 1.0));
+        }
+        _riffWriter.Write(buffer.AsSpan(0, track.Length));
+        Pool.Return(buffer);
+    }
+
+    /// <summary>Writes raw 16-bit PCM samples.</summary>
+    private void Write(ReadOnlySpan<short> data)
     {
         _riffWriter.Write(data);
     }
+
+    private static readonly System.Buffers.ArrayPool<short> Pool = System.Buffers.ArrayPool<short>.Shared;
 
     public void Dispose()
     {

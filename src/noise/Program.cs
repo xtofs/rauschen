@@ -27,14 +27,14 @@ public static class NoiseExample
         {
             var alpha = (int)color;
             var spectrum = BuildNoiseSpectrum(N, RATE, alpha, rng);
-            var samples = Spectrum.ToSamples(spectrum, Volume);
+            var track = Spectrum.ToSamples(spectrum);
 
             var name = color.ToString().ToLowerInvariant();
             const int blocks = 2;
             using var writer = new WavWriter($"noise-{name}.wav", RATE);
             for (var block = 0; block < blocks; block++)
             {
-                writer.Write(samples);
+                writer.Write(track, Volume);
             }
 
             Console.WriteLine($"noise-{name}.wav: power ~ 1/f^{alpha} ({alpha * -3:+0;-0;0} dB/octave, {blocks * (double)N / RATE:F2} s)");

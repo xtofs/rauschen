@@ -8,7 +8,7 @@ public record class MelodyWriter(WavWriter Writer, double Bpm, Waveform Waveform
 
     const double NoteVolume = 0.25;
 
-    private static readonly System.Buffers.ArrayPool<short> Pool = System.Buffers.ArrayPool<short>.Shared;
+    private static readonly System.Buffers.ArrayPool<double> Pool = System.Buffers.ArrayPool<double>.Shared;
 
     public void WriteNote(Note note)
     {
@@ -22,10 +22,10 @@ public record class MelodyWriter(WavWriter Writer, double Bpm, Waveform Waveform
         {
             double env = Math.Min(1.0, Math.Min(i, count - 1 - i) / (double)fade);
             double phase = frequency * i / rate % 1.0; // position within the cycle, [0, 1)
-            wave[i] = (short)(short.MaxValue * NoteVolume * env * Oscillate(_waveform, phase));
+            wave[i] = env * Oscillate(_waveform, phase);
         }
 
-        _writer.Write(wave.AsSpan(0, count));
+        _writer.Write(wave.AsSpan(0, count), NoteVolume);
 
         Pool.Return(wave);
     }

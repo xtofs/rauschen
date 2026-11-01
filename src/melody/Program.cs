@@ -79,11 +79,11 @@ public static class MelodyExample
         for (var bar = 0; bar < progression.Length; bar++)
         {
             // the bar's chord as a seamlessly looping block, normalized to [-1, 1]
-            var block = Spectrum.ToSamples(BuildSpectrum(progression[bar], N, rate), volume: 1.0);
+            var block = Spectrum.ToSamples(BuildSpectrum(progression[bar], N, rate));
             for (var i = 0; i < samplesPerBar; i++)
             {
                 var env = Math.Min(1.0, Math.Min(i, samplesPerBar - 1 - i) / (double)fade);
-                track[bar * samplesPerBar + i] = env * block[i % block.Length] / short.MaxValue;
+                track[bar * samplesPerBar + i] = env * block[i % block.Length];
             }
         }
         return track;
@@ -108,19 +108,13 @@ public static class MelodyExample
     }
 
     /// <summary>
-    /// Converts a track in [-1, 1] to 16-bit PCM at the given volume and writes
-    /// it to a WAV file.
+    /// Writes a track in [-1, 1] to a WAV file at the given volume — the
+    /// double-to-PCM conversion happens inside the WavWriter.
     /// </summary>
     public static void WriteMix(string path, double[] mix, int rate, double volume)
     {
-        var samples = new short[mix.Length];
-        for (var i = 0; i < samples.Length; i++)
-        {
-            samples[i] = (short)(short.MaxValue * volume * Math.Clamp(mix[i], -1.0, 1.0));
-        }
-
         using var writer = new WavWriter(path, rate);
-        writer.Write(samples);
+        writer.Write(mix, volume);
         Console.WriteLine($"wrote {path} ({(double)mix.Length / rate:F2} s)");
     }
 

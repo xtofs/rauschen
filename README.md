@@ -13,7 +13,7 @@ rauschen/
 │   │   ├── Pitch.cs       # pitch as semitones relative to A4
 │   │   ├── Note.cs        # pitch + duration in ticks (960 PPQN)
 │   │   ├── Monophonic.cs  # melody text format parser
-│   │   ├── WriterExtensions.cs  # WriteNote / WriteRest (sine synthesis)
+│   │   ├── MelodyWriter.cs  # renders notes as waveforms (sine, square, ...)
 │   │   └── WAV/           # low-level RIFF/WAV writing
 │   ├── console/           # demo executable
 │   ├── melody/            # demo: chord synthesis via inverse FFT (FftSharp)
@@ -62,10 +62,12 @@ Note[] melody = "E4/4 E4/4 F4/4 G4/4".ParseMelody();
   resolution 960 = 2⁶·3·5 keeps dotted notes, triplets, and quintuplets
   exact. `Beats` and `ToSeconds(bpm)` convert outward.
 * **`WavWriter`** — writes mono 16-bit PCM WAV files on top of a generic
-  RIFF chunk writer. The `WriteNote(seconds, pitch, waveform)` /
-  `WriteRest(seconds)` extensions synthesize notes with a short fade in/out;
-  the `Waveform` enum selects the oscillator shape (`Sine` by default,
-  `Square`, `Sawtooth`, or `Triangle`).
+  RIFF chunk writer. All processing code operates on `double[]` tracks in
+  [−1, 1]; `Write(track, volume)` is the single place where floating-point
+  audio is clamped and converted to integer PCM.
+* **`MelodyWriter`** — renders notes to a `WavWriter` with a selectable
+  oscillator shape (the `Waveform` enum: `Sine` by default, `Square`,
+  `Sawtooth`, `Triangle`, or `Gaussian`) and a short fade in/out per note.
 
 ## Colors of noise
 
@@ -92,7 +94,7 @@ pass WAV files to plot those instead: `plot_spectra.py audio.wav -o out.png`.
 ```sh
 dotnet build rauschen.slnx
 dotnet run --project src/console    # writes audio.wav to the working directory
-dotnet run --project src/melody     # writes melody-over-chords.wav (I | V7 | I | V7)
+dotnet run --project src/melody     # writes ode-to-joy.wav (melody over I | V7 | I | V7)
 dotnet run --project src/noise      # writes noise-white.wav ... noise-violet.wav
 ./convert.sh audio.wav              # optional: convert to audio.m4a (needs ffmpeg)
 ```
