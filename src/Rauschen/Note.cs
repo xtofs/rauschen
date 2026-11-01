@@ -44,7 +44,10 @@ public readonly record struct Note(Pitch Pitch, int Ticks) : IParsable<Note>
         var slashIx = span.IndexOf('/');
         if (slashIx < 0) return false;
 
-        if (!Pitch.TryParse(span[..slashIx], out var pitch)) return false;
+        if (!Pitch.TryParse(span[..slashIx], out var pitch))
+        {
+            return false;
+        }
         span = span[(slashIx + 1)..]; // keep only the duration part
 
         // parse the (possibly multi-digit) denominator, e.g. /4 or /16

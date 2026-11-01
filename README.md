@@ -61,6 +61,9 @@ Note[] melody = "E4/4 E4/4 F4/4 G4/4".ParseMelody();
   quarter note (960 PPQN, as used by MIDI sequencers). The fixed-point
   resolution 960 = 2⁶·3·5 keeps dotted notes, triplets, and quintuplets
   exact. `Beats` and `ToSeconds(bpm)` convert outward.
+* **`Track`** — a mono audio track: `double[]` samples in [−1, 1] tied to their
+  sample rate, so tracks can only be mixed (`Track.Mix`, weighted superposition
+  that cannot clip) or written when the rates match.
 * **`WavWriter`** — writes mono 16-bit PCM WAV files on top of a generic
   RIFF chunk writer. All processing code operates on `double[]` tracks in
   [−1, 1]; `Write(track, volume)` is the single place where floating-point

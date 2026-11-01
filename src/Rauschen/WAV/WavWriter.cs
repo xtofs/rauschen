@@ -37,6 +37,17 @@ public class WavWriter : IDisposable
     }
 
     /// <summary>
+    /// Writes a <see cref="Track"/> at the given volume. The track's sample
+    /// rate must match the writer's.
+    /// </summary>
+    public void Write(Track track, double volume = 1.0)
+    {
+        if (track.Rate != Rate)
+            throw new InvalidOperationException($"Track rate {track.Rate} does not match writer rate {Rate}");
+        Write(track.Samples, volume);
+    }
+
+    /// <summary>
     /// Writes a track of samples in [-1, 1], scaled by <paramref name="volume"/>,
     /// as 16-bit PCM. Values outside the range are clamped. This is the single
     /// place where floating-point audio is converted to integer PCM — all

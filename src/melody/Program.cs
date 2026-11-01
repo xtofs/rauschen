@@ -37,15 +37,15 @@ public static class MelodyExample
 
         var melodyTrack = CreateMelodyTrack(melody, BPM, RATE);
         var chordTrack = CreateChordProgressionTrack(progression, BPM, RATE);
-        var mix = MixTracks(melodyTrack, chordTrack);
-        WriteMix("ode-to-joy.wav", mix, RATE, Volume);
+        var mix = melodyTrack.Mix(chordTrack);
+        WriteMix("ode-to-joy.wav", mix, Volume);
     }
 
     /// <summary>
-    /// Renders a melody into a track of samples in [-1, 1]: one sine per note
-    /// with a short fade in/out, placed one after another on the timeline.
+    /// Renders a melody into a track: one sine per note with a short fade
+    /// in/out, placed one after another on the timeline.
     /// </summary>
-    public static double[] CreateMelodyTrack(Note[] melody, double bpm, int rate)
+    public static Track CreateMelodyTrack(Note[] melody, double bpm, int rate)
     {
         var total = melody.Sum(note => (int)(rate * note.ToSeconds(bpm)));
         var track = new double[total];
@@ -61,16 +61,16 @@ public static class MelodyExample
             }
             position += count;
         }
-        return track;
+        return new Track(track, rate);
     }
 
     /// <summary>
-    /// Renders a chord progression (one chord per 4/4 bar) into a track of
-    /// samples in [-1, 1]: each chord is synthesized as a spectrum, inverse-FFT'd
+    /// Renders a chord progression (one chord per 4/4 bar) into a track:
+    /// each chord is synthesized as a spectrum, inverse-FFT'd
     /// into a looping block, and faded in/out over 10 ms at the bar boundaries
     /// (switching spectra mid-phase would otherwise click).
     /// </summary>
-    public static double[] CreateChordProgressionTrack(Chord[] progression, double bpm, int rate, int beatsPerBar = 4)
+    public static Track CreateChordProgressionTrack(Chord[] progression, double bpm, int rate, int beatsPerBar = 4)
     {
         var samplesPerBar = (int)(rate * beatsPerBar * 60.0 / bpm);
         var fade = Math.Max(1, rate / 100); // 10 ms declick at bar changes
@@ -86,36 +86,18 @@ public static class MelodyExample
                 track[bar * samplesPerBar + i] = env * block[i % block.Length];
             }
         }
-        return track;
+        return new Track(track, rate);
     }
 
     /// <summary>
-    /// Mixes two tracks by addition (superposition) — combining simultaneous
-    /// sounds is simply adding their samples. The weights sum to 1, so two
-    /// tracks in [-1, 1] cannot clip. The shorter track is padded with silence.
+    /// Writes a track to a WAV file at the given volume — the double-to-PCM
+    /// conversion happens inside the WavWriter.
     /// </summary>
-    public static double[] MixTracks(double[] first, double[] second, double firstWeight = 0.5)
+    public static void WriteMix(string path, Track mix, double volume)
     {
-        var secondWeight = 1.0 - firstWeight;
-        var mix = new double[Math.Max(first.Length, second.Length)];
-        for (var i = 0; i < mix.Length; i++)
-        {
-            var a = i < first.Length ? first[i] : 0.0;
-            var b = i < second.Length ? second[i] : 0.0;
-            mix[i] = firstWeight * a + secondWeight * b;
-        }
-        return mix;
-    }
-
-    /// <summary>
-    /// Writes a track in [-1, 1] to a WAV file at the given volume — the
-    /// double-to-PCM conversion happens inside the WavWriter.
-    /// </summary>
-    public static void WriteMix(string path, double[] mix, int rate, double volume)
-    {
-        using var writer = new WavWriter(path, rate);
+        using var writer = new WavWriter(path, mix.Rate);
         writer.Write(mix, volume);
-        Console.WriteLine($"wrote {path} ({(double)mix.Length / rate:F2} s)");
+        Console.WriteLine($"wrote {path} ({mix.Duration.TotalSeconds:F2} s)");
     }
 
     /// <summary>

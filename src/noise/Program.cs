@@ -27,7 +27,7 @@ public static class NoiseExample
         {
             var alpha = (int)color;
             var spectrum = BuildNoiseSpectrum(N, RATE, alpha, rng);
-            var track = Spectrum.ToSamples(spectrum);
+            var track = new Track(Spectrum.ToSamples(spectrum), RATE);
 
             var name = color.ToString().ToLowerInvariant();
             const int blocks = 2;
