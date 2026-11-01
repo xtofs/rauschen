@@ -15,7 +15,8 @@ rauschen/
 │   │   ├── Monophonic.cs  # melody text format parser
 │   │   ├── WriterExtensions.cs  # WriteNote / WriteRest (sine synthesis)
 │   │   └── WAV/           # low-level RIFF/WAV writing
-│   └── console/           # demo executable
+│   ├── console/           # demo executable
+│   └── spectrum/          # demo: inverse-FFT synthesis with FftSharp
 ├── scripts/
 │   └── gen_pitches.py     # generates the named-pitch constants in Pitch.cs
 ├── convert.sh             # wav -> m4a via ffmpeg
@@ -68,8 +69,9 @@ Note[] melody = "E4/4 E4/4 F4/4 G4/4".ParseMelody();
 
 ```sh
 dotnet build rauschen.slnx
-dotnet run --project src/console   # writes audio.wav to the working directory
-./convert.sh audio.wav             # optional: convert to audio.m4a (needs ffmpeg)
+dotnet run --project src/console    # writes audio.wav to the working directory
+dotnet run --project src/spectrum   # writes spectrum.wav (chord from an inverse FFT)
+./convert.sh audio.wav              # optional: convert to audio.m4a (needs ffmpeg)
 ```
 
 ## Regenerating the pitch constants
