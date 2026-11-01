@@ -70,6 +70,13 @@ public readonly record struct Note(Pitch Pitch, int Ticks) : IParsable<Note>
         result = new Note(pitch, ticks);
         return true;
     }
+
+    internal (double Frequency, double Duration) FrequencyAndDuration(double bpm)
+    {
+        var frequency = this.Pitch.Frequency;
+        var duration = this.ToSeconds(bpm);
+        return (frequency, duration);
+    }
 }
 
 

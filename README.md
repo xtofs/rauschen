@@ -59,8 +59,10 @@ Note[] melody = "E4/4 E4/4 F4/4 G4/4".ParseMelody();
   resolution 960 = 2⁶·3·5 keeps dotted notes, triplets, and quintuplets
   exact. `Beats` and `ToSeconds(bpm)` convert outward.
 * **`WavWriter`** — writes mono 16-bit PCM WAV files on top of a generic
-  RIFF chunk writer. The `WriteNote(seconds, pitch)` / `WriteRest(seconds)`
-  extensions synthesize sine waves with a short fade in/out.
+  RIFF chunk writer. The `WriteNote(seconds, pitch, waveform)` /
+  `WriteRest(seconds)` extensions synthesize notes with a short fade in/out;
+  the `Waveform` enum selects the oscillator shape (`Sine` by default,
+  `Square`, `Sawtooth`, or `Triangle`).
 
 ## Build and run
 
