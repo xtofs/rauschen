@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/console/console.csproj" />
+    <Project Path="src/noise/noise.csproj" />
     <Project Path="src/Rauschen/Rauschen.csproj" />
     <Project Path="src/spectrum/spectrum.csproj" />
   </Folder>

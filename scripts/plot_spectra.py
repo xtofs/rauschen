@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Plots the spectra of the generated WAV files.
+
+Left panel:  the noise colors (noise-*.wav) as power spectra on a log frequency
+             axis — each color should be a straight line at its dB/octave slope.
+Right panel: the chord spectrum (spectrum.wav) with its harmonic spikes.
+
+Files that don't exist are skipped. Run the demo apps first:
+
+    dotnet run --project src/noise
+    dotnet run --project src/spectrum
+
+Requires numpy and matplotlib (not in the standard library), e.g.:
+
+    python3 -m venv .venv && .venv/bin/pip install numpy matplotlib
+    .venv/bin/python scripts/plot_spectra.py
+
+Usage: plot_spectra.py [output.png]   (default: spectra.png)
+"""
+
+import os
+import sys
+import wave
+
+import numpy as np
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+N = 65536  # analysis block: one FFT block of the generator apps
+
+NOISE_COLORS = [
+    ("white", "#888888", 0),
+    ("pink", "#e377c2", -3),
+    ("brown", "#8c564b", -6),
+    ("blue", "#1f77b4", 3),
+    ("violet", "#9467bd", 6),
+]
+
+CHORD_LABELS = [(261.6, "C4"), (329.6, "E4"), (392.0, "G4"), (466.2, "Bb4")]
+
+
+def read_block(path):
+    """Returns (rate, first N samples as float array) of a mono 16-bit WAV."""
+    with wave.open(path) as w:
+        rate = w.getframerate()
+        samples = np.frombuffer(w.readframes(N), dtype=np.int16).astype(float)
+    return rate, samples
+
+
+def plot_noise(ax):
+    found = False
+    for name, color, slope in NOISE_COLORS:
+        path = f"noise-{name}.wav"
+        if not os.path.exists(path):
+            print(f"skipping {path} (not found)")
+            continue
+        found = True
+        rate, samples = read_block(path)
+        freqs = np.fft.rfftfreq(N, 1 / rate)
+        power = np.abs(np.fft.rfft(samples)) ** 2
+
+        # average into log-spaced bands for a readable line
+        edges = np.logspace(np.log10(25), np.log10(20_000), 120)
+        idx = np.searchsorted(freqs, edges)
+        band_f, band_p = [], []
+        for i in range(len(edges) - 1):
+            lo, hi = idx[i], idx[i + 1]
+            if hi > lo:
+                band_f.append(np.sqrt(edges[i] * edges[i + 1]))  # geometric center
+                band_p.append(power[lo:hi].mean())
+        ax.plot(band_f, 10 * np.log10(band_p), color=color, label=f"{name} ({slope:+d} dB/oct)")
+
+    ax.set_xscale("log")
+    ax.set_xlabel("frequency [Hz]")
+    ax.set_ylabel("power [dB]")
+    ax.set_title("noise spectra (one block)")
+    if found:
+        ax.legend()
+    ax.grid(True, which="both", alpha=0.3)
+
+
+def plot_chord(ax, path="spectrum.wav"):
+    if not os.path.exists(path):
+        print(f"skipping {path} (not found)")
+        ax.set_title(f"{path} not found")
+        return
+    rate, samples = read_block(path)
+    freqs = np.fft.rfftfreq(N, 1 / rate)
+    magnitude = np.abs(np.fft.rfft(samples)) / N
+
+    ax.plot(freqs, magnitude, color="#2ca02c", lw=0.8)
+    for f, label in CHORD_LABELS:
+        bin_ = int(round(f * N / rate))
+        ax.annotate(label, (f, magnitude[bin_]), textcoords="offset points",
+                    xytext=(0, 8), ha="center", fontsize=9)
+    ax.set_xlim(0, 2000)
+    ax.set_xlabel("frequency [Hz]")
+    ax.set_ylabel("magnitude")
+    ax.set_title(f"{path}: chord harmonics")
+    ax.grid(True, alpha=0.3)
+
+
+def main():
+    output = sys.argv[1] if len(sys.argv) > 1 else "spectra.png"
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+    plot_noise(ax1)
+    plot_chord(ax2)
+
+    plt.tight_layout()
+    plt.savefig(output, dpi=110)
+    print(f"saved {output}")
+
+
+if __name__ == "__main__":
+    main()

@@ -16,9 +16,11 @@ rauschen/
 │   │   ├── WriterExtensions.cs  # WriteNote / WriteRest (sine synthesis)
 │   │   └── WAV/           # low-level RIFF/WAV writing
 │   ├── console/           # demo executable
-│   └── spectrum/          # demo: inverse-FFT synthesis with FftSharp
+│   ├── spectrum/          # demo: inverse-FFT synthesis with FftSharp
+│   └── noise/             # demo: colors of noise (white, pink, brown, blue, violet)
 ├── scripts/
-│   └── gen_pitches.py     # generates the named-pitch constants in Pitch.cs
+│   ├── gen_pitches.py     # generates the named-pitch constants in Pitch.cs
+│   └── plot_spectra.py    # plots the spectra of the generated WAV files
 ├── convert.sh             # wav -> m4a via ffmpeg
 └── rauschen.slnx
 ```
@@ -65,12 +67,23 @@ Note[] melody = "E4/4 E4/4 F4/4 G4/4".ParseMelody();
   the `Waveform` enum selects the oscillator shape (`Sine` by default,
   `Square`, `Sawtooth`, or `Triangle`).
 
+## Colors of noise
+
+The `noise` demo generates noise purely in the frequency domain: every audible
+FFT bin gets a **uniformly random phase** (that is what makes it noise) and a
+magnitude following the power envelope *P ∝ 1/f^α* — white (α = 0), pink (1),
+brown (2), blue (−1), violet (−2), i.e. 0 / −3 / −6 / +3 / +6 dB per octave.
+The shared `Spectrum.ToSamples` then inverse-FFTs the spectrum into PCM samples.
+`scripts/plot_spectra.py` (needs numpy + matplotlib) plots the resulting spectra
+to verify the slopes visually.
+
 ## Build and run
 
 ```sh
 dotnet build rauschen.slnx
 dotnet run --project src/console    # writes audio.wav to the working directory
 dotnet run --project src/spectrum   # writes spectrum.wav (chord from an inverse FFT)
+dotnet run --project src/noise      # writes noise-white.wav ... noise-violet.wav
 ./convert.sh audio.wav              # optional: convert to audio.m4a (needs ffmpeg)
 ```
 
